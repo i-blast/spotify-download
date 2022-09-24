@@ -29,8 +29,12 @@ from sys import executable
 from aiohttp import ClientSession
 from dotenv import load_dotenv
 import shutil
+import os
+import pathlib
+
+
 load_dotenv("config.env")
-import os 
+
 # Log
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(message)s",
@@ -74,25 +78,25 @@ if BUG:
 #    print(f"python arq key is not a valid string skiping it ...! Reason:{e}")
 #   aiohttpsession = ClientSession()
 #    arq = None
-    
+
 class Mbot(Client):
     def  __init__(self):
         name = self.__class__.__name__.lower()
         super().__init__(
             ":memory:",
             plugins=dict(root=f"{name}/plugins"),
-            workdir="./cache/",
+            workdir="./data/cache/",
             api_id=API_ID,
             api_hash=API_HASH,
             bot_token=BOT_TOKEN,
             sleep_threshold=30
         )
+
     async def start(self):
-        if path.exists('./cache'):
-           shutil.rmtree('./cache)')
-           mkdir('./cache/')
-        else:
-             mkdir('./cache/')
+        if path.exists('./data/cache/'):
+           shutil.rmtree('./data/cache/')
+        pathlib.Path('./data/cache/').mkdir(parents=True, exist_ok=True)
+
         global BOT_INFO
         await super().start()
         BOT_INFO = await self.get_me()
@@ -101,7 +105,7 @@ class Mbot(Client):
         for chat in AUTH_CHATS:
             await self.send_photo(chat,"https://telegra.ph/file/97bc8a091ac1b119b72e4.jpg","**Spotify Downloa Started**")
         LOGGER.info(f"Bot Started As {BOT_INFO.username}\n")
-    
+
     async def stop(self,*args):
         await super().stop()
         LOGGER.info("Bot Stopped, Bye.")
